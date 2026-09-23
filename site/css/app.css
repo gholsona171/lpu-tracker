@@ -141,6 +141,23 @@ body[data-route="setup"] nav.tabs { display: none; }
 }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { text-align: center; }
+.stat-value { display: block; font-family: Fraunces, serif; font-size: 1.25rem; font-weight: 600; }
+.stat-label { display: block; color: var(--muted); font-size: .8rem; }
+.segs { display: flex; gap: 6px; margin: 4px 0 12px; }
+.segs button { flex: 1; min-height: 40px; padding: 6px 8px; font-size: .95rem; background: var(--chip); }
+.segs button.on { background: var(--chip-on); color: var(--chip-on-ink); border-color: var(--chip-on); }
+.pill.warn { background: var(--gold); color: var(--gold-ink); }
+.pill.bad { background: var(--bad); color: #fff; }
+.warn-text { color: var(--warn); font-weight: 600; }
+.advice { background: var(--chip); }
+.sigpad { width: 100%; aspect-ratio: 400 / 160; background: #fff; border: 1px dashed var(--line); border-radius: 10px; touch-action: none; display: block; }
+.sig-view { width: 100%; max-width: 400px; background: #fff; border-radius: 10px; color: #1d1a16; }
+.head select { width: auto; min-height: 40px; }
+.flags:empty { display: none; }
+
 @media print {
   .beta, header.top, nav.tabs, .screen-only, #toast { display: none !important; }
   body { background: #fff; color: #000; padding: 0; }

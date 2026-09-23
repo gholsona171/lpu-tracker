@@ -11,6 +11,10 @@ import { renderEvents, renderEventEditor } from './ui/events.js';
 import { renderSettings } from './ui/settings.js';
 import { renderDoor } from './ui/door.js';
 import { renderQr } from './ui/eventqr.js';
+import { renderBooks } from './ui/books.js';
+import { renderDonationForm } from './ui/donation-form.js';
+import { renderExpenseForm } from './ui/expense-form.js';
+import { renderPayForm, renderPayee } from './ui/pay-form.js';
 
 const CONN_KEY = 'lpu.conn';
 const DEMO_KEY = 'lpu.demo';
@@ -75,6 +79,7 @@ async function connect(conn) {
 const ROUTES = {
   today: renderToday, events: renderEvents, event: renderEventEditor, settings: renderSettings,
   door: renderDoor, qr: renderQr,
+  books: renderBooks, donation: renderDonationForm, expense: renderExpenseForm, pay: renderPayForm, payee: renderPayee,
 };
 
 async function route() {
