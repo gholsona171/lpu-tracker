@@ -52,7 +52,7 @@ export function makeHandler({ makeStore, now = () => new Date(), limiter = creat
       return send(404, { error: 'Not found' });
     } catch (e) {
       console.error('checkin error', e && e.message);
-      return send(/full/.test(e?.message) ? 403 : 503, { error: /full/.test(e?.message) ? e.message : 'Could not save right now. Please try again.' });
+      return send(/full/.test(e?.message) ? 403 : 503, { error: /full/.test(e?.message) ? e.message : 'Check-in is not available right now. Please try again, or check in with a volunteer at the door.' });
     }
   };
 }
