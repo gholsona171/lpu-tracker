@@ -8,18 +8,20 @@ export const SETTINGS = 'data/settings.json';
 export const DONATIONS = 'data/donations.json';
 export const EXPENSES = 'data/expenses.json';
 export const PAYEES = 'data/payees.json';
-const SIMPLE = { donations: DONATIONS, expenses: EXPENSES, payees: PAYEES };
+export const FILINGS = 'data/filings.json';
+const SIMPLE = { donations: DONATIONS, expenses: EXPENSES, payees: PAYEES, filings: FILINGS };
 export const DEFAULT_SETTINGS = { id: 'settings', orgName: 'Love, Peace & Unity', ein: '99-0471961', fyEnd: '12-31',
-  address: '', officer: '', website: 'https://lovepeaceunity.org', hasEmployees: false,
+  address: '', officer: '', website: 'https://lovepeaceunity.org', hasEmployees: false, firstFiscalYear: 2024, paidFundraisers: false,
+  miId: '803311369', netAssetsStart: {},
   mission: "Love, Peace, Unity is dedicated to fostering community through artistry and charity. We aim to build meaningful connections, inspire contributions, and provide support for local artists and disadvantaged individuals through creative programming and community outreach initiatives.",
   targets: { uniquePeople: 300, foodBags: 200, targetZips: '48216,48209,48210' } };
 
 const pathFor = (kind, opts = {}) => ({ event: EVENTS, person: PEOPLE, settings: SETTINGS,
-  donation: DONATIONS, expense: EXPENSES, payee: PAYEES,
+  donation: DONATIONS, expense: EXPENSES, payee: PAYEES, filing: FILINGS,
   checkin: opts.eventId && checkinPath(opts.eventId) })[kind];
 
 export function createDb({ store, outbox }) {
-  const state = { events: [], people: [], checkins: {}, settings: { ...DEFAULT_SETTINGS }, donations: [], expenses: [], payees: [] };
+  const state = { events: [], people: [], checkins: {}, settings: { ...DEFAULT_SETTINGS }, donations: [], expenses: [], payees: [], filings: [] };
   let queued = 0; let offline = false; const listeners = new Set(); const errorListeners = new Set();
   const emit = () => listeners.forEach((fn) => fn());
   let running = null; let again = false;
@@ -34,10 +36,10 @@ export function createDb({ store, outbox }) {
 
   async function load() {
     try {
-      const [ev, pe, se, files, dn, ex, py] = await Promise.all([store.readJson(EVENTS), store.readJson(PEOPLE),
-        store.readJson(SETTINGS), store.listDir('data/checkins'), store.readJson(DONATIONS), store.readJson(EXPENSES), store.readJson(PAYEES)]);
+      const [ev, pe, se, files, dn, ex, py, fi] = await Promise.all([store.readJson(EVENTS), store.readJson(PEOPLE),
+        store.readJson(SETTINGS), store.listDir('data/checkins'), store.readJson(DONATIONS), store.readJson(EXPENSES), store.readJson(PAYEES), store.readJson(FILINGS)]);
       state.events = ev.data || []; state.people = pe.data || [];
-      state.donations = dn.data || []; state.expenses = ex.data || []; state.payees = py.data || [];
+      state.donations = dn.data || []; state.expenses = ex.data || []; state.payees = py.data || []; state.filings = fi.data || [];
       state.settings = { ...DEFAULT_SETTINGS, ...(se.data || [])[0] };
       const lists = await Promise.all(files.map((f) => store.readJson(`data/checkins/${f}`)));
       state.checkins = Object.fromEntries(files.map((f, i) => [f.replace('.json', ''), lists[i].data || []]));

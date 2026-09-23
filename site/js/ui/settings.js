@@ -23,6 +23,8 @@ export function renderSettings(root, { db, conn, disconnect: drop }) {
     await db.save('settings', {
       ...s, orgName: f.orgName.value.trim(), ein: f.ein.value.trim(), address: f.address.value.trim(),
       officer: f.officer.value.trim(), website: f.website.value.trim(), fyEnd: f.fyEnd.value, mission: f.mission.value.trim(),
+      firstFiscalYear: Number(f.firstFiscalYear.value) || 2024, miId: f.miId.value.trim(), paidFundraisers: f.paidFundraisers.checked, hasEmployees: f.hasEmployees.checked,
+      netAssetsStart: Object.fromEntries(f.netAssets.value.split(',').map((x) => x.split(':').map((y) => y.trim())).filter(([y, v]) => /^\d{4}$/.test(y) && v !== undefined).map(([y, v]) => [y, Math.round(Number(v.replace(/[$,]/g, '')) * 100) || 0])),
       targets: { uniquePeople: Number(f.uniquePeople.value) || 0, foodBags: Number(f.foodBags.value) || 0,
         targetZips: f.targetZips.value.replace(/\s/g, '') },
     }, { background: true });
@@ -43,6 +45,12 @@ export function renderSettings(root, { db, conn, disconnect: drop }) {
       field('Principal officer', f.officer), field('Website', f.website),
       field('Mission statement', f.mission, 'Printed on the impact report exactly as written here.'),
       field('Fiscal year ends (MM-DD)', f.fyEnd, 'Calendar year is 12-31, which matches the IRS.'),
+      h('h2', {}, 'Filings'),
+      field('First fiscal year', f.firstFiscalYear, 'The year LPU was formed. Drives the 990-N test and the first Michigan report.'),
+      field('Michigan ID number', f.miId),
+      field('Net assets at start of each year', f.netAssets, 'Only needed for a 990-EZ. Format: year:amount, comma separated.'),
+      h('label', { class: 'check' }, f.paidFundraisers, 'LPU pays someone to raise money'),
+      h('label', { class: 'check' }, f.hasEmployees, 'LPU has employees on payroll'),
       h('h2', {}, 'Yearly targets'),
       field('Unique people reached', f.uniquePeople), field('Food bags given', f.foodBags),
       field('Target ZIP codes', f.targetZips, 'Separate with commas.'),

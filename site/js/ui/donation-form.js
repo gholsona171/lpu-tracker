@@ -3,6 +3,9 @@ import { sanitizeDonation, DONATION_METHODS } from '../domain/validate-books.js'
 import { donationFlags, fmtMoney, toCents } from '../domain/books.js';
 import { todayLocal } from '../domain/time.js';
 import { METHOD_LABEL } from './books.js';
+import { donationReceipt } from '../domain/forms.js';
+import { contextFor } from './filings.js';
+import { fiscalYearFor } from '../domain/fiscal.js';
 
 const opts = (list) => list.map((v) => ({ value: v, label: METHOD_LABEL[v] || v }));
 
@@ -32,7 +35,17 @@ export function renderDonationForm(root, { db }, id) {
   };
   const flags = h('p', { class: 'hint flags', 'aria-live': 'polite' });
   const msg = h('p', { class: 'error-text', role: 'alert' });
-  const inKindOnly = h('div', {}, field('What was given', f.description, 'Describe the goods. The amount is your best estimate of fair value.'));
+  const inKindOnly = h('div', {}, field('What was given', f.description, 'Describe the items and quantities, e.g. "18 loaves of bread, 40 lbs produce". The amount is your own estimate for the books; it is never printed on the receipt.'));
+  const receiptBox = h('div');
+  function showReceipt() {
+    const ctx = contextFor(db, fiscalYearFor(existing.date, db.state.settings.fyEnd || '12-31'));
+    const r = donationReceipt(ctx, existing);
+    mount(receiptBox, h('div', { class: 'row screen-only' }, h('button', { onclick: () => window.print() }, 'Print or save as PDF')),
+      h('article', { class: 'report-page sheet' }, h('header', {}, h('img', { src: 'icons/logo-160.png', alt: '', width: 56, height: 56 }), h('h1', {}, r.title)),
+        h('div', { class: 'letter' }, h('p', {}, new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })),
+          h('p', {}, r.donorName, h('br'), r.donorAddress || r.donorEmail || ''), r.paragraphs.map((p) => h('p', { style: 'white-space: pre-line' }, p)))));
+    receiptBox.scrollIntoView({ behavior: 'smooth' });
+  }
   const cashOnly = h('div', {}, field('How', f.method));
 
   function updateFlags() {
@@ -71,5 +84,7 @@ export function renderDonationForm(root, { db }, id) {
         field('Event', f.eventId)),
       flags, msg,
       h('div', { class: 'row' }, h('button', { class: 'primary', type: 'submit' }, 'Save'), h('a', { class: 'button', href: '#/books' }, 'Cancel'),
-        existing && h('button', { type: 'button', class: 'danger', onclick: remove }, 'Delete'))));
+        existing && h('button', { type: 'button', onclick: showReceipt }, 'Print receipt'),
+        existing && h('button', { type: 'button', class: 'danger', onclick: remove }, 'Delete'))),
+    receiptBox);
 }

@@ -16,6 +16,7 @@ import { renderDonationForm } from './ui/donation-form.js';
 import { renderExpenseForm } from './ui/expense-form.js';
 import { renderPayForm, renderPayee } from './ui/pay-form.js';
 import { renderImpact, renderReport } from './ui/impact.js';
+import { renderFilings, renderFiling } from './ui/filings.js';
 
 const CONN_KEY = 'lpu.conn';
 const DEMO_KEY = 'lpu.demo';
@@ -81,12 +82,13 @@ const ROUTES = {
   today: renderToday, events: renderEvents, event: renderEventEditor, settings: renderSettings,
   door: renderDoor, qr: renderQr,
   books: renderBooks, donation: renderDonationForm, expense: renderExpenseForm, pay: renderPayForm, payee: renderPayee,
-  impact: renderImpact, report: renderReport,
+  impact: renderImpact, report: renderReport, filings: renderFilings, filing: renderFiling,
 };
 
 async function route() {
   if (cleanup) { cleanup(); cleanup = null; }
-  const [name = 'today', param] = location.hash.replace(/^#\/?/, '').split('/');
+  const [name = 'today', ...rest] = location.hash.replace(/^#\/?/, '').split('/');
+  const param = rest.join('/');
   document.body.dataset.route = name;
   for (const a of document.querySelectorAll('nav.tabs a')) a.classList.toggle('on', a.dataset.tab === name);
   if (name === 'setup' || !ctx) {

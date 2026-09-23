@@ -1,5 +1,6 @@
 import { h, mount, fmtDate, fmtTime } from './dom.js';
 import { isOpen, todayLocal } from '../domain/time.js';
+import { alertsFor, filingRow } from './filings.js';
 
 export function eventCard(ev, count, { live = false } = {}) {
   return h('div', { class: 'card event' + (live ? ' live' : '') },
@@ -21,8 +22,10 @@ export function renderToday(root, { db }) {
     const live = events.find((e) => isOpen(e, now));
     const next = live || events.find((e) => e.date >= today);
     const past = events.filter((e) => e !== next && e.date < today).slice(-3).reverse();
+    const alerts = alertsFor(db);
     mount(root,
       h('h1', {}, 'Today'),
+      alerts.length > 0 && h('div', { class: 'card alerts' }, h('h2', {}, 'Filings due'), alerts.map(filingRow)),
       next ? eventCard(next, db.checkinsFor(next.id).length, { live: !!live })
         : h('div', { class: 'card' }, h('p', {}, 'No upcoming events.'),
           h('a', { class: 'button primary', href: '#/event/new' }, 'Create an event')),
