@@ -158,10 +158,36 @@ body[data-route="setup"] nav.tabs { display: none; }
 .head select { width: auto; min-height: 40px; }
 .flags:empty { display: none; }
 
+textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 1rem Karla, sans-serif; }
+h3 { font-family: Karla, sans-serif; font-size: .95rem; margin: 12px 0 6px; color: var(--muted); }
+.row.between { justify-content: space-between; }
+.bars { display: grid; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: minmax(90px, 38%) 1fr auto; gap: 8px; align-items: center; font-size: .95rem; }
+.bar-track { display: block; height: 10px; background: var(--chip); border-radius: 999px; overflow: hidden; }
+.bar-track.big { height: 14px; margin-top: 6px; }
+.bar-fill { display: block; height: 100%; background: var(--gold); border-radius: 999px; }
+.bar-fill.done { background: var(--ok); }
+.bar-num { min-width: 2.5em; text-align: right; font-weight: 600; }
+.bar-num small { color: var(--muted); font-weight: 400; }
+.target { margin: 8px 0 12px; }
+.report-page { background: #fff; color: #1d1a16; padding: 24px; border-radius: var(--radius); max-width: 720px; margin: 0 auto; }
+.report-page header { text-align: center; margin-bottom: 16px; }
+.report-page h1 { font-size: 1.6rem; margin: 8px 0 0; }
+.report-title { font-size: 1.1rem; color: #6b635a; }
+.report-page section { margin: 18px 0; }
+.report-page h2 { font-size: 1.15rem; border-bottom: 1px solid #e6ddcf; padding-bottom: 4px; }
+.report-table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.report-table td { padding: 5px 4px; border-bottom: 1px solid #f0e9dc; vertical-align: top; }
+.report-table td:last-child { text-align: right; white-space: nowrap; }
+.report-page footer { margin-top: 24px; font-size: .85rem; color: #6b635a; text-align: center; }
+
 @media print {
   .beta, header.top, nav.tabs, .screen-only, #toast { display: none !important; }
   body { background: #fff; color: #000; padding: 0; }
   .poster h1 { font-size: 44pt; }
   .qr { width: 12cm; }
+  main { max-width: none; padding: 0; }
+  .report-page { border-radius: 0; padding: 0; max-width: none; }
+  .report-page section { break-inside: avoid; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

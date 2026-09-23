@@ -15,6 +15,7 @@ import { renderBooks } from './ui/books.js';
 import { renderDonationForm } from './ui/donation-form.js';
 import { renderExpenseForm } from './ui/expense-form.js';
 import { renderPayForm, renderPayee } from './ui/pay-form.js';
+import { renderImpact, renderReport } from './ui/impact.js';
 
 const CONN_KEY = 'lpu.conn';
 const DEMO_KEY = 'lpu.demo';
@@ -80,6 +81,7 @@ const ROUTES = {
   today: renderToday, events: renderEvents, event: renderEventEditor, settings: renderSettings,
   door: renderDoor, qr: renderQr,
   books: renderBooks, donation: renderDonationForm, expense: renderExpenseForm, pay: renderPayForm, payee: renderPayee,
+  impact: renderImpact, report: renderReport,
 };
 
 async function route() {

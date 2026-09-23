@@ -11,6 +11,7 @@ export const PAYEES = 'data/payees.json';
 const SIMPLE = { donations: DONATIONS, expenses: EXPENSES, payees: PAYEES };
 export const DEFAULT_SETTINGS = { id: 'settings', orgName: 'Love, Peace & Unity', ein: '99-0471961', fyEnd: '12-31',
   address: '', officer: '', website: 'https://lovepeaceunity.org', hasEmployees: false,
+  mission: "Love, Peace, Unity is dedicated to fostering community through artistry and charity. We aim to build meaningful connections, inspire contributions, and provide support for local artists and disadvantaged individuals through creative programming and community outreach initiatives.",
   targets: { uniquePeople: 300, foodBags: 200, targetZips: '48216,48209,48210' } };
 
 const pathFor = (kind, opts = {}) => ({ event: EVENTS, person: PEOPLE, settings: SETTINGS,
