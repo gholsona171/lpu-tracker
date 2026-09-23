@@ -108,8 +108,46 @@ Every record: `id` (random UUID), `createdAt`, `updatedAt`, `deleted` (soft dele
   goods/services given in return + their value, event link.
 - **expenses.json** — date, payee, amount, functional category (program / management /
   fundraising), `isContractorService`, payee id.
-- **payees.json** — name, address, `w9OnFile` (yes/no + date). **TINs are never stored**
-  in the beta; they are typed in at the moment a 1099 is generated and discarded.
+- **payees.json** — name, address (may be blank or "c/o" a shelter), `kind`
+  (`individual` | `business`), `w9OnFile` (yes/no + date), `tinStatus`
+  (`unknown` | `provided` | `refused`), `communityWorker` flag (see §5a).
+  **TINs are never stored** in the beta; they are typed in at the moment a 1099 is
+  generated and discarded.
+- **payments.json** — payee, date, amount, method (cash, Cash App, check, gift card),
+  work done (e.g. "lot cleanup"), event link, goods-vs-services split, backup withholding
+  amount, signed-receipt flag.
+
+## 5a. Paying people (individuals, not businesses)
+
+LPU will pay people who are not businesses: someone struggling on the street paid to clean
+the lot before or after an event, an individual cooking or serving food, a performer. The
+app treats this as a normal, expected case, not an exception.
+
+- **Pay-someone flow on the phone, in under a minute:** name (a first name or nickname is
+  enough to start), what they did, amount, how paid. The person signs on the phone screen
+  to confirm they were paid. That signed record is LPU's proof of the expense.
+- **No paperwork up front for small amounts.** Nobody is turned away for lacking ID, an
+  address or a Social Security number.
+- **Running total per person per year** is always visible. The app nudges at $1,500 to
+  collect a W-9 before the person crosses the $2,000 1099 threshold (2026 figure; kept by
+  tax year).
+- **If someone reaches the threshold without giving a TIN,** federal rules require 24%
+  backup withholding on further payments. The app calculates it on the payment screen,
+  tracks the withheld total, and adds **Form 945** (annual backup withholding return,
+  due Jan 31) and the deposit reminder to the Filings calendar. The 1099-NEC is still
+  generated with "TIN not provided".
+- **Goods vs services:** paying someone for food (goods) is not 1099-reportable; paying
+  them to cook or serve (services) is. A payment can be split so only the service part
+  counts toward the 1099 total.
+- **Employee vs contractor:** the IRS decides by who controls the work, not by the label.
+  One-off odd jobs are generally contractor work. If the same person works on a regular
+  schedule under LPU's direction, the app shows a warning on their record that this may be
+  employment (W-2, withholding, Michigan rules) and to check with a preparer before
+  continuing. The app does not decide this.
+- **Impact:** payments to community members count as a program outcome ("work
+  opportunities": people paid, hours, dollars put directly into the community) on the
+  dashboard and year-end report. Payees flagged `communityWorker` are reported by count
+  and totals only, never by name.
 - **filings.json** — filing id + tax year, status, filed date, confirmation number, notes.
 
 ## 6. Storage and sync
@@ -158,6 +196,7 @@ Reminder at 30 days before the due date, on the Today screen. Whole calendar exp
 | 990 | above 990-EZ limits | May 15 | Flag: "Use a preparer"; export line-mapped totals |
 | 8868 extension | 990-EZ/990 and user asks | May 15 | Official PDF filled |
 | 1099-NEC | payee paid ≥ $2,000 in the year for services (2026+; $600 for 2025) | Jan 31 | Official PDF, copies B and C for the payee plus IRIS upload CSV. Needs you: TIN at print time, W-9 on file |
+| 945 backup withholding | any backup withholding in the year (§5a) | Jan 31 | Answer sheet with totals; Needs you: deposit + file |
 | Donor acknowledgment | single gift ≥ $250 | Jan 31 | Letter per donor with the required statement about goods/services |
 | Quid-pro-quo disclosure | payment > $75 partly for goods/services | At gift | Flag on the donation + receipt wording |
 | Year-end donor statements | any donor with gifts in the year | Jan 31 | One letter per donor (courtesy) |
@@ -209,7 +248,7 @@ email/SMS sending, online form submission to any government system.
 
 1. Skeleton: repo, Pages, PWA install, settings, GitHub store + outbox, events.
 2. Check-in: volunteer screen, Worker, QR + self check-in page.
-3. Books: donations, in-kind, expenses, payees.
+3. Books: donations, in-kind, expenses, payees, pay-someone flow with signature (§5a).
 4. Impact dashboard + report.
 5. Compliance calendar, 990-N/MI answer sheets, donor letters, `.ics` export.
 6. Official PDF fills: 1099-NEC (+ IRIS CSV), 990-EZ, 8868.
