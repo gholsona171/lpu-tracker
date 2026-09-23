@@ -77,7 +77,7 @@ Flow:
      (1 hour before start to 2 hours after end);
    - validates and trims every field against an allow-list; unknown fields are dropped;
    - rate-limits: max 5 submissions per IP per 10 minutes, max 500 per event;
-   - finds or creates the person (§5 person key) and appends the check-in;
+   - finds or creates the person (§5 matching) and appends the check-in;
    - writes to `data/` with SHA-checked commits, retrying on conflict (§6).
 5. Guest sees "You're checked in" with the event name.
 
@@ -85,7 +85,8 @@ Door volunteers also use the admin app's own check-in screen (faster search, can
 help given). Both paths produce identical records; `source` is `self` or `volunteer`.
 
 Help received is recorded by the volunteer, not the guest (guests cannot claim a food bag).
-The self check-in form covers basics, role, household size and optional demographics.
+The self check-in form asks first name (required), last name, then optional role, ZIP, birth
+year, household size and demographics, each skippable.
 
 ## 5. Data model (`data/*.json`)
 
@@ -94,12 +95,14 @@ Every record: `id` (random UUID), `createdAt`, `updatedAt`, `deleted` (soft dele
 - **settings.json** — org name, EIN, address, principal officer, website, fiscal year end
   (`12-31`), has-employees flag (off), impact targets.
 - **events.json** — name, date, start/end time, location, `eventKey`, program.
-- **people.json** — `personKey`, first name (or initials), last initial, ZIP, birth year,
-  optional gender, race/ethnicity, veteran status. Each optional field accepts
-  "prefer not to say".
-  - `personKey` = lowercase first name + last initial + ZIP + birth year. Returning guests
-    match on it. If any part is missing, no match is attempted (they count as a new person
-    and are flagged "unmatched" so a volunteer can merge later).
+- **people.json** — first name, last name, then all optional: ZIP, birth year, gender,
+  race/ethnicity, veteran status.
+  - **Only the first name is required.** Every other question has a visible "Skip" and the
+    form has a "That's all, check me in" button right after the name. Nobody is pushed to
+    answer more. Skipped answers are stored as blank and reported as "Not given".
+  - **Returning guests** match on normalized first + last name. If both records have a ZIP
+    or birth year and they differ, they are treated as different people. A name-only match
+    is marked "likely" so a volunteer can split or merge later.
 - **checkins/<eventId>.json** — personId, role (attendee, performer, volunteer, food
   recipient), household size, help received (`food_bag`, `meal`, `referral` + note),
   source, time. One file per event keeps concurrent writers apart.
