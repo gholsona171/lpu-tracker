@@ -1,7 +1,11 @@
 # LPU Tracker (beta)
 
-Phone app for Love, Peace & Unity: event check-in (including QR self check-in), and, in later
-phases, books, impact reports and IRS/Michigan filing prep.
+Phone app for Love, Peace & Unity: event check-in (including QR self check-in), books
+(donations, in-kind gifts, expenses, paying people with a signature), an impact dashboard and
+printable funder report, and a filings calendar that prepares every IRS and Michigan form.
+
+Shipped 2026-09-23 (Plans 1–5). Not yet done: filling the official 990-EZ/8868 PDFs (the app
+produces line-by-line worksheets instead), and the Supabase move for real personal data.
 
 **Beta: test data only.** This repo is public. `data/` is the beta database. Do not enter real
 people's information until the move to Supabase.

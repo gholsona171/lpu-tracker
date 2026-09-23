@@ -256,3 +256,12 @@ email/SMS sending, online form submission to any government system.
 5. Compliance calendar, 990-N/MI answer sheets, donor letters, `.ics` export.
 6. Official PDF fills: 1099-NEC (+ IRIS CSV), 990-EZ, 8868.
 7. Year simulation, fixes, install on phone.
+
+## 14. Status (2026-09-23)
+
+Plans 1–5 built the same day: check-in + QR + Worker, books + pay-someone, impact + report,
+filings calendar + generated forms (990-N sheet, 990-EZ worksheet, 1099-NEC copies + IRIS CSV,
+945 sheet, donor letters, statements, single-gift receipts incl. in-kind food wording, MI annual
+report sheet, MI solicitation/CTS-03 sheet, .ics export), and a simulated-year test. 68 tests.
+Deferred: official PDF fills for 990-EZ/8868; the Worker rate limiter is per-isolate; the
+event key is readable in the public repo (time window is the real guard until Supabase).
