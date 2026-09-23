@@ -5,15 +5,20 @@ import { checkinPath, PEOPLE } from '../domain/checkin.js';
 
 export const EVENTS = 'data/events.json';
 export const SETTINGS = 'data/settings.json';
+export const DONATIONS = 'data/donations.json';
+export const EXPENSES = 'data/expenses.json';
+export const PAYEES = 'data/payees.json';
+const SIMPLE = { donations: DONATIONS, expenses: EXPENSES, payees: PAYEES };
 export const DEFAULT_SETTINGS = { id: 'settings', orgName: 'Love, Peace & Unity', ein: '99-0471961', fyEnd: '12-31',
   address: '', officer: '', website: 'https://lovepeaceunity.org', hasEmployees: false,
   targets: { uniquePeople: 300, foodBags: 200, targetZips: '48216,48209,48210' } };
 
 const pathFor = (kind, opts = {}) => ({ event: EVENTS, person: PEOPLE, settings: SETTINGS,
+  donation: DONATIONS, expense: EXPENSES, payee: PAYEES,
   checkin: opts.eventId && checkinPath(opts.eventId) })[kind];
 
 export function createDb({ store, outbox }) {
-  const state = { events: [], people: [], checkins: {}, settings: { ...DEFAULT_SETTINGS } };
+  const state = { events: [], people: [], checkins: {}, settings: { ...DEFAULT_SETTINGS }, donations: [], expenses: [], payees: [] };
   let queued = 0; let offline = false; const listeners = new Set(); const errorListeners = new Set();
   const emit = () => listeners.forEach((fn) => fn());
   let running = null; let again = false;
@@ -22,14 +27,16 @@ export function createDb({ store, outbox }) {
     if (path === EVENTS) state.events = mergeRecords(state.events, records);
     else if (path === PEOPLE) state.people = mergeRecords(state.people, records);
     else if (path === SETTINGS) state.settings = { ...DEFAULT_SETTINGS, ...records.at(-1) };
+    else if (Object.values(SIMPLE).includes(path)) { const k = Object.keys(SIMPLE).find((x) => SIMPLE[x] === path); state[k] = mergeRecords(state[k], records); }
     else { const id = path.split('/').pop().replace('.json', ''); state.checkins[id] = mergeRecords(state.checkins[id], records); }
   }
 
   async function load() {
     try {
-      const [ev, pe, se, files] = await Promise.all([store.readJson(EVENTS), store.readJson(PEOPLE),
-        store.readJson(SETTINGS), store.listDir('data/checkins')]);
+      const [ev, pe, se, files, dn, ex, py] = await Promise.all([store.readJson(EVENTS), store.readJson(PEOPLE),
+        store.readJson(SETTINGS), store.listDir('data/checkins'), store.readJson(DONATIONS), store.readJson(EXPENSES), store.readJson(PAYEES)]);
       state.events = ev.data || []; state.people = pe.data || [];
+      state.donations = dn.data || []; state.expenses = ex.data || []; state.payees = py.data || [];
       state.settings = { ...DEFAULT_SETTINGS, ...(se.data || [])[0] };
       const lists = await Promise.all(files.map((f) => store.readJson(`data/checkins/${f}`)));
       state.checkins = Object.fromEntries(files.map((f, i) => [f.replace('.json', ''), lists[i].data || []]));
@@ -106,5 +113,6 @@ export function createDb({ store, outbox }) {
     onError: (fn) => { errorListeners.add(fn); return () => errorListeners.delete(fn); },
     activeEvents: () => state.events.filter((e) => !e.deleted).sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start)),
     checkinsFor: (id) => (state.checkins[id] || []).filter((c) => !c.deleted),
+    active: (kind) => (state[kind] || []).filter((r) => !r.deleted),
   };
 }
