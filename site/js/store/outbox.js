@@ -9,8 +9,9 @@ export function memoryOutbox() {
 
 function req(r) { return new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
 
-export async function openOutbox() {
-  const open = indexedDB.open('lpu-tracker', 1);
+// One IndexedDB per connection so demo edits can never flush into the real repo.
+export async function openOutbox(name = 'lpu-tracker') {
+  const open = indexedDB.open(name, 1);
   open.onupgradeneeded = () => { open.result.createObjectStore('outbox', { keyPath: 'id' }); open.result.createObjectStore('cache'); };
   const idb = await req(open);
   const tx = (name, mode = 'readonly') => idb.transaction(name, mode).objectStore(name);

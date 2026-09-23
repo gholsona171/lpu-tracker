@@ -76,7 +76,7 @@ Flow:
    - verifies the event exists, the key matches, and it is inside the check-in window
      (1 hour before start to 2 hours after end);
    - validates and trims every field against an allow-list; unknown fields are dropped;
-   - rate-limits: max 5 submissions per IP per 10 minutes, max 500 per event;
+   - rate-limits: max 40 submissions per IP per 10 minutes (guests on venue Wi-Fi share one IP), max 500 per event;
    - finds or creates the person (§5 matching) and appends the check-in;
    - writes to `data/` with SHA-checked commits, retrying on conflict (§6).
 5. Guest sees "You're checked in" with the event name.

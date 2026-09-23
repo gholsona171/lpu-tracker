@@ -1,5 +1,6 @@
 // Best-effort per-isolate limiter. Cloudflare may run several isolates; that is acceptable for the beta.
-export function createLimiter({ max = 5, windowMs = 600000 } = {}) {
+// The limit is generous because guests on the venue Wi-Fi share one IP address.
+export function createLimiter({ max = 40, windowMs = 600000 } = {}) {
   const hits = new Map();
   return {
     allow(key, now = Date.now()) {

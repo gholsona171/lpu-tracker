@@ -1,0 +1,15 @@
+{
+  "name": "LPU Tracker",
+  "short_name": "LPU",
+  "description": "Love, Peace & Unity event check-in, books and filings.",
+  "start_url": "./#/today",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf6ee",
+  "theme_color": "#1d1a16",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

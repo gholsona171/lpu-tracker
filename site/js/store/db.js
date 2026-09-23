@@ -14,8 +14,9 @@ const pathFor = (kind, opts = {}) => ({ event: EVENTS, person: PEOPLE, settings:
 
 export function createDb({ store, outbox }) {
   const state = { events: [], people: [], checkins: {}, settings: { ...DEFAULT_SETTINGS } };
-  let queued = 0; let offline = false; const listeners = new Set();
+  let queued = 0; let offline = false; const listeners = new Set(); const errorListeners = new Set();
   const emit = () => listeners.forEach((fn) => fn());
+  let running = null; let again = false;
 
   function applyLocal(path, records) {
     if (path === EVENTS) state.events = mergeRecords(state.events, records);
@@ -52,11 +53,24 @@ export function createDb({ store, outbox }) {
     applyLocal(path, [rec]);
     await outbox.add({ id: uuid(), path, record: rec });
     queued++; emit();
-    await flush();
+    const p = flush();
+    if (opts.background) p.catch((e) => errorListeners.forEach((fn) => fn(e)));
+    else await p;
     return rec;
   }
 
-  async function flush() {
+  // One flush at a time; a request during a flush triggers one more pass afterwards.
+  function flush() {
+    if (running) { again = true; return running; }
+    running = (async () => {
+      let r;
+      do { again = false; r = await flushOnce(); } while (again);
+      return r;
+    })().finally(() => { running = null; });
+    return running;
+  }
+
+  async function flushOnce() {
     const ops = await outbox.all();
     const byPath = new Map();
     for (const op of ops) byPath.set(op.path, [...(byPath.get(op.path) || []), op]);
@@ -77,10 +91,19 @@ export function createDb({ store, outbox }) {
     return { pending: queued };
   }
 
+  // Re-read one event's check-ins and the people file (used by the live QR counter).
+  async function refreshEvent(eventId) {
+    const [c, p] = await Promise.all([store.readJson(checkinPath(eventId)), store.readJson(PEOPLE)]);
+    state.checkins[eventId] = mergeRecords(c.data || [], state.checkins[eventId] || []);
+    state.people = mergeRecords(p.data || [], state.people);
+    emit();
+  }
+
   return {
-    state, load, save, flush,
+    state, load, save, flush, refreshEvent,
     pending: () => queued, isOffline: () => offline,
     onChange: (fn) => { listeners.add(fn); return () => listeners.delete(fn); },
+    onError: (fn) => { errorListeners.add(fn); return () => errorListeners.delete(fn); },
     activeEvents: () => state.events.filter((e) => !e.deleted).sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start)),
     checkinsFor: (id) => (state.checkins[id] || []).filter((c) => !c.deleted),
   };
