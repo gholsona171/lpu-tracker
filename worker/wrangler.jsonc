@@ -1,0 +1,12 @@
+{
+  "name": "lpu-checkin",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-18",
+  "observability": { "enabled": true },
+  "vars": {
+    "DATA_OWNER": "gholsona171",
+    "DATA_REPO": "lpu-tracker",
+    "DATA_BRANCH": "main",
+    "ALLOWED_ORIGINS": "https://gholsona171.github.io,http://localhost:8080"
+  }
+}
