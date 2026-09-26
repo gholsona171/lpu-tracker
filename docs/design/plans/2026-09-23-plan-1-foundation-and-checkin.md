@@ -8,7 +8,7 @@
 
 **Tech Stack:** Vanilla JS (ES2022 modules), IndexedDB, GitHub REST Contents API, Cloudflare Workers (wrangler), GitHub Pages via Actions, qrcode-generator 2.0.4 (MIT, vendored), Node 24 `node:test`.
 
-**Spec:** `docs/superpowers/specs/2026-09-23-lpu-tracker-design.md`
+**Spec:** `docs/design/specs/2026-09-23-lpu-tracker-design.md`
 
 **Later plans:** Plan 2 = Books + pay-someone flow. Plan 3 = Impact dashboard + report. Plan 4 = Compliance calendar + generated forms. Plan 5 = year simulation + install.
 
